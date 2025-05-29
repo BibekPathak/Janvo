@@ -6,7 +6,7 @@ Welcome to **Janvo**, a full-stack web application that allows users to **practi
 
 ## 🚀 Live Demo
 
-👉 [Visit Janvo]([https://your-live-site-link.com](https://janvo.onrender.com))
+👉 [Visit Janvo]((https://janvo.onrender.com))
 
 ---
 
