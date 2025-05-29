@@ -6,7 +6,7 @@ Welcome to **Janvo**, a full-stack web application that allows users to **practi
 
 ## 🚀 Live Demo
 
-👉 [Visit Janvo](https://your-live-site-link.com)
+👉 [Visit Janvo]([https://your-live-site-link.com](https://janvo.onrender.com))
 
 ---
 
@@ -24,7 +24,7 @@ Welcome to **Janvo**, a full-stack web application that allows users to **practi
 - 📄 **User Onboarding** – Smooth onboarding for new users
 - 👥 **Friends System** – Add, remove, and manage friends
 - 💬 **Real-Time Chat** – Instant messaging with WebSocket (or other real-time tech)
-- 📹 **Video Calling** – Peer-to-peer video communication
+- 📹 **Video Calling** – Peer-to-peer video communication with stream
 - 🎨 **32 Custom UI Themes** – Choose from multiple themes for a personalized experience
 - 🚨 **Protected Routes** – Secure access to authenticated areas
 - 🧰 **Custom Hooks** – Built with best practices in mind
