@@ -1,5 +1,10 @@
 import FriendRequest from "../models/FriendRequest.js";
 import User from "../models/user.js";
+import { StreamChat } from "stream-chat";
+import dotenv from "dotenv";
+dotenv.config();
+
+const streamClient = StreamChat.getInstance(process.env.STREAM_API_KEY, process.env.STREAM_API_SECRET);
 
 export async function getRecommandedUsers(req, res) {
     try {
@@ -139,5 +144,56 @@ export async function getOutgoingFriendReqs(req, res) {
   } catch (error) {
     console.log("Error in getOutgoingFriendReqs controller", error.message);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function getLatestChats(req, res) {
+  try {
+    const userId = req.user.id.toString();
+    // Query channels where the user is a member
+    const filters = { type: "messaging", members: { $in: [userId] } };
+    const sort = [{ last_message_at: -1 }];
+    const channels = await streamClient.queryChannels(filters, sort, { limit: 20 });
+
+    // Get online users from Stream using presence
+    const onlineUsers = await streamClient.queryUsers({
+      presence: true,
+      limit: 100
+    });
+    
+    // Create a map of user IDs to their online status
+    const onlineStatusMap = new Map();
+    onlineUsers.users.forEach(user => {
+      onlineStatusMap.set(user.id, user.online);
+    });
+
+    // For each channel, find the friend (other member), get their info, and the last message
+    const chatSummaries = await Promise.all(
+      channels.map(async (channel) => {
+        const otherMemberId = channel.state.members
+          ? Object.keys(channel.state.members).find((id) => id !== userId)
+          : channel.data.members.find((id) => id !== userId);
+        if (!otherMemberId) return null;
+        const friend = await User.findById(otherMemberId).select("fullName profilePic");
+        const lastMessage = channel.state.messages.length > 0
+          ? channel.state.messages[channel.state.messages.length - 1].text
+          : "";
+        return {
+          _id: channel.id,
+          friend: friend ? {
+            _id: friend._id,
+            fullName: friend.fullName,
+            profilePic: friend.profilePic,
+            isOnline: onlineStatusMap.get(friend._id.toString()) || false,
+          } : null,
+          lastMessage,
+          lastMessageAt: channel.state.last_message_at || channel.last_message_at,
+        };
+      })
+    );
+    res.status(200).json(chatSummaries.filter(Boolean));
+  } catch (error) {
+    console.error("Error in getLatestChats controller:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 }

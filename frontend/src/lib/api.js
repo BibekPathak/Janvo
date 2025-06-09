@@ -65,3 +65,17 @@ export async function getStreamToken() {
   const response = await axiosInstance.get("/chat/token");
   return response.data;
 }
+
+export async function getLatestChats() {
+  const response = await axiosInstance.get("/users/latest-chats");
+  return response.data;
+}
+
+export const sendNotification = async (recipientId, message, type) => {
+  const response = await api.post("/chat/notify", {
+    recipientId,
+    message,
+    type,
+  });
+  return response.data;
+};
